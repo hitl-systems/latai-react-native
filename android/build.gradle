@@ -1,0 +1,63 @@
+// SPDX-License-Identifier: Apache-2.0 OR MIT
+// The Android side of latai-react-native: LataiModule (Java), the JSI glue (cpp/LataiJsi.cpp, built by
+// CMake) and the prebuilt liblatai.so, which the Android build of latai (phase 14.1) puts at
+//   android/src/main/jniLibs/<abi>/liblatai.so         (not committed)
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:8.5.2"
+    }
+}
+
+apply plugin: "com.android.library"
+
+android {
+    namespace "ai.latai.rn"
+    compileSdkVersion 34
+    ndkVersion "26.3.11579264"
+
+    defaultConfig {
+        minSdkVersion 28 // liblatai is built for API 28 (docs/mobile.md)
+        // The ABIs `cargo xtask mobile --aar` builds by default; armeabi-v7a is not shipped.
+        ndk { abiFilters "arm64-v8a", "x86_64" }
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++17 -fexceptions -frtti"
+                arguments "-DANDROID_STL=c++_shared"
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.22.1"
+        }
+    }
+
+    buildFeatures { prefab true }
+
+    packagingOptions {
+        pickFirst "**/libc++_shared.so"
+        pickFirst "**/libfbjni.so"
+        pickFirst "**/libjsi.so"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    // The version is the app's: React Native's Gradle plugin pins it.
+    implementation "com.facebook.react:react-android"
+}

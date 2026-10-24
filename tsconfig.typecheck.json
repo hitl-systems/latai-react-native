@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "preserve",
+    "paths": {
+      "react-native": ["test-stubs/react-native.d.ts"],
+      "latai-react-native": ["src/index.ts"]
+    }
+  },
+  "include": ["src", "example", "test-stubs"]
+}

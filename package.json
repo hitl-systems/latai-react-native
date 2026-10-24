@@ -1,0 +1,30 @@
+{
+  "name": "latai-react-native",
+  "version": "0.1.0",
+  "description": "React Native bindings for latai: JSI glue over the C ABI (API v2) and a TypeScript API (run, runStream, pack management, speech streams, typed errors).",
+  "license": "Apache-2.0 OR MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hitl-systems/latai-react-native.git"
+  },
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "react-native": "src/index.ts",
+  "files": [
+    "src",
+    "cpp",
+    "android",
+    "ios",
+    "latai-react-native.podspec"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json"
+  },
+  "peerDependencies": {
+    "react-native": ">=0.73.0"
+  },
+  "devDependencies": {
+    "typescript": "5.6.3"
+  }
+}
