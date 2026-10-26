@@ -4,9 +4,7 @@ JSI glue over the latai C ABI (`include/latai.h`, API v2) and a TypeScript API: 
 `run`, `runStream` (an async iterable), pack management, `listen` (speech streams) and `LataiError`
 with a category. Apache-2.0 OR MIT. **Status: written without React Native, Xcode or the Android
 NDK; the TypeScript type-checks and its logic runs against a mock, the C++ passes `clang
--fsyntax-only` against stubs of the JSI headers; nothing ran on a device** (task 14.3.2 stays
-open). Bridgeless mode (the default from React Native 0.76) is **not** supported yet. See
-[docs/mobile-sdks.md](../../docs/mobile-sdks.md).
+-fsyntax-only` against stubs of the JSI headers; nothing ran on a device**. Treat it as a published design, not a shipping path yet. Bridgeless mode (the default from React Native 0.76) is **not** supported yet.
 
 ```ts
 import { Runtime } from 'latai-react-native';
@@ -26,7 +24,7 @@ await rt.close();
 ```
 
 Errors are `LataiError` (`number`, `code` "E0206", `message`, `hint`, `details`, `category`). Same rules
-as the Python and Node SDKs ([docs/sdk.md](../../docs/sdk.md)):
+as the Python and Node SDKs:
 
 - `run` **rejects** with the typed error when the response ends `finish: 'error'`, with the whole
   response in `err.response` (`latai.started` is false in it when the engine was never called). Pass
@@ -55,14 +53,13 @@ so the same code serves the old architecture and the new one through the interop
 ## Build and run on a device
 
 Needs a React Native 0.73-0.75 app (not bridgeless), Node, the Android SDK/NDK 26 or Xcode 15, and
-the mobile build of liblatai (phase 14.1), which is not committed.
+the mobile build of liblatai, which is not published yet.
 
-1. **Add the package** to the app: `npm install ../path/to/lat-one/sdk/react-native` (or a `file:`
-   dependency / `yarn link`). Autolinking finds `latai-react-native.podspec` and `android/`.
+1. **Add the package** to the app: `npm install github:hitl-systems/latai-react-native`. Autolinking finds `latai-react-native.podspec` and `android/`.
 2. **Place the library.**
-   - Android: `sdk/react-native/android/src/main/jniLibs/<abi>/liblatai.so` (`arm64-v8a`,
+   - Android: `android/src/main/jniLibs/<abi>/liblatai.so` (`arm64-v8a`,
      `x86_64`). The CMake file links the glue against it; the module loads it.
-   - iOS: `sdk/react-native/ios/Frameworks/latai.xcframework` (static or dynamic, no headers inside).
+   - iOS: `ios/Frameworks/latai.xcframework` (static or dynamic, no headers inside).
      Then `cd ios && pod install`.
 3. **Use the example component:** copy `example/App.tsx` over the app's `App.tsx`.
 4. **Put a pack on the device** (a signed `.gguf` and its `.minisig` in the app's documents
@@ -72,11 +69,11 @@ the mobile build of liblatai (phase 14.1), which is not committed.
 
 ## Check without a device
 
+From this folder:
+
 ```text
-cd sdk/react-native && npm install typescript@5.6.3 --no-save && npm run typecheck
-python3 sdk/tools/check_bindings.py
-clang++ -std=c++17 -fsyntax-only -Wall -Wextra -I include -I sdk/react-native/cpp \
-    -I sdk/react-native/cpp/stubs sdk/react-native/cpp/LataiJsi.cpp
+npm install typescript@5.6.3 --no-save && npm run typecheck
+clang++ -std=c++17 -fsyntax-only -Wall -Wextra -I include -I cpp -I cpp/stubs cpp/LataiJsi.cpp
 ```
 
 `cpp/stubs/` and `test-stubs/` are test aids written from memory of the real headers; delete them
